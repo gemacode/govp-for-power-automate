@@ -47,7 +47,7 @@
         }
       }
     },
-    "/govps/{code}": {
+    "/connectors/govps/{code}": {
       "get": {
         "operationId": "VerifyGovp",
         "summary": "Verify a GOVP",
