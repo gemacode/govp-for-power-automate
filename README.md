@@ -14,6 +14,10 @@ Automate y Power Apps sin escribir código.
 - acción de prueba de conexión mediante `/connectors/me`;
 - idempotencia obligatoria en emisión.
 
+La comprobación HTTP de Exchange continúa siendo pública. Dentro del custom
+connector, **Verify GOVP** reutiliza la conexión autenticada para que Azure API
+Hub conserve la ruta de conexión al invocar la acción.
+
 La estructura sigue la [documentación oficial de custom
 connectors](https://learn.microsoft.com/connectors/custom-connectors/define-openapi-definition).
 
