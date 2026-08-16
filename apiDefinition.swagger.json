@@ -49,7 +49,7 @@
     },
     "/connectors/govps/{code}": {
       "get": {
-        "operationId": "VerifyGovp",
+        "operationId": "VerifyGovpAuthenticated",
         "summary": "Verify a GOVP",
         "description": "Returns public GOVP status, reason and integrity.",
         "x-ms-summary": "Verify GOVP",
