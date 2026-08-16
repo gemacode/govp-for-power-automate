@@ -3,7 +3,7 @@
   "info": {
     "title": "GOVP Exchange",
     "description": "Issue, verify and revoke GOVP from Power Automate and Power Apps.",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "host": "partners.gemacode.org",
   "basePath": "/api/exchange",
