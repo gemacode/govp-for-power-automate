@@ -11,7 +11,7 @@ test('las acciones usan operationId únicos y visibles',()=>{
 });
 
 test('las acciones usan la conexión autenticada de Power Platform',()=>{
-  assert.equal(api.paths['/govps/{code}'].get.security,undefined);
+  assert.equal(api.paths['/connectors/govps/{code}'].get.security,undefined);
   assert.equal(api.paths['/connectors/issue'].post.security,undefined);
   assert.equal(api.paths['/connectors/govps/{code}/revoke'].post.security,undefined);
 });
