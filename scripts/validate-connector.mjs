@@ -10,7 +10,7 @@ assert.deepEqual(definition.schemes,['https']);
 assert.equal(definition.securityDefinitions.api_key.name,'Authorization');
 assert.equal(properties.properties.connectionParameters.api_key.type,'securestring');
 const operations=Object.values(definition.paths).flatMap((path)=>Object.values(path)).map((operation)=>operation.operationId);
-assert.deepEqual(operations.sort(),['GetConnectorIdentity','IssueGovp','RevokeGovp','VerifyGovp']);
+assert.deepEqual(operations.sort(),['GetConnectorIdentity','IssueGovp','RevokeGovp','VerifyGovpAuthenticated']);
 const issue=definition.paths['/connectors/issue'].post;
 assert(issue.parameters.some((parameter)=>parameter.name==='Idempotency-Key'&&parameter.required));
 assert.deepEqual(definition.definitions.Source.properties.platform.enum,['power_automate']);

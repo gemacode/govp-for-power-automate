@@ -3,8 +3,9 @@
 Custom connector open source para emitir, comprobar y revocar GOVP desde Power
 Automate y Power Apps sin escribir código.
 
-> Estado `0.1.0`: candidato importable. Falta la validación dentro de un entorno
-> Power Platform real antes de considerarlo instalado o listo para producción.
+> Estado `0.1.1`: conector instalado y validado de extremo a extremo en un
+> entorno Power Platform real. La validación cubre conexión, identidad, emisión,
+> repetición idempotente, comprobación, revocación y comprobación posterior.
 
 ## Contenido
 
@@ -13,6 +14,15 @@ Automate y Power Apps sin escribir código.
 - acciones **Issue GOVP**, **Verify GOVP** y **Revoke GOVP**;
 - acción de prueba de conexión mediante `/connectors/me`;
 - idempotencia obligatoria en emisión.
+
+La comprobación HTTP `/govps/{code}` de Exchange continúa siendo pública. Dentro
+del custom connector, **Verify GOVP** usa el alias autenticado
+`/connectors/govps/{code}` para que Azure API Hub conserve la ruta de conexión al
+invocar la acción.
+
+La prueba nativa se realizó en el entorno aislado `GOVP CRM Test`; no requirió
+modificar el entorno predeterminado ni la administración de usuarios de
+Microsoft 365.
 
 La estructura sigue la [documentación oficial de custom
 connectors](https://learn.microsoft.com/connectors/custom-connectors/define-openapi-definition).
@@ -44,7 +54,7 @@ replay protection, rotación y entrega verificable del webhook.
 npm run check
 ```
 
-La salida reproducible queda en `dist/govp-for-power-automate-0.1.0.zip`.
+La salida reproducible queda en `dist/govp-for-power-automate-0.1.1.zip`.
 
 Apache-2.0. Microsoft, Power Automate y Power Apps son marcas de Microsoft; este
 proyecto no está afiliado ni certificado por Microsoft.

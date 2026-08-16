@@ -3,7 +3,7 @@
   "info": {
     "title": "GOVP Exchange",
     "description": "Issue, verify and revoke GOVP from Power Automate and Power Apps.",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "host": "partners.gemacode.org",
   "basePath": "/api/exchange",
@@ -47,14 +47,13 @@
         }
       }
     },
-    "/govps/{code}": {
+    "/connectors/govps/{code}": {
       "get": {
-        "operationId": "VerifyGovp",
+        "operationId": "VerifyGovpAuthenticated",
         "summary": "Verify a GOVP",
         "description": "Returns public GOVP status, reason and integrity.",
         "x-ms-summary": "Verify GOVP",
         "x-ms-visibility": "important",
-        "security": [],
         "parameters": [{ "name": "code", "in": "path", "required": true, "type": "string", "x-ms-summary": "GOVP code" }],
         "responses": {
           "200": { "description": "Verification result", "schema": { "$ref": "#/definitions/VerificationResponse" } },
@@ -124,7 +123,7 @@
     "IssuanceResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "replayed": { "type": "boolean" }, "govp": { "$ref": "#/definitions/GovpReference" } } },
     "VerificationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "verification": { "type": "object", "properties": { "status": { "type": "string" }, "reasonCode": { "type": "string" }, "integrityValid": { "type": "boolean" } } }, "govp": { "type": "object" }, "lifecycle": { "type": "object" } } },
     "RevocationCommand": { "type": "object", "required": ["reason"], "properties": { "reason": { "type": "string" } } },
-    "RevocationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "status": { "type": "string", "enum": ["revoked"] }, "revokedAt": { "type": "string", "format": "date-time" } } },
+    "RevocationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "status": { "type": "string", "enum": ["revoked"] }, "revokedAt": { "type": "string", "description": "UTC timestamp in ISO 8601 format." } } },
     "ConnectorIdentityResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "connector": { "type": "object" } } },
     "ErrorResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "error": { "type": "string" } } }
   }

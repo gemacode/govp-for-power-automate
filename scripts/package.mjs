@@ -9,7 +9,7 @@ const staging=await mkdtemp(join(tmpdir(),'govp-power-automate-'));
 try{
   await mkdir(dist,{recursive:true});
   for(const name of ['apiDefinition.swagger.json','apiProperties.json','README.md','LICENSE'])await cp(resolve(root,name),resolve(staging,name));
-  const output=resolve(dist,'govp-for-power-automate-0.1.0.zip');
+  const output=resolve(dist,'govp-for-power-automate-0.1.1.zip');
   await rm(output,{force:true});
   const result=spawnSync('zip',['-q','-r',output,'.'],{cwd:staging,encoding:'utf8'});
   if(result.status!==0)throw new Error(result.stderr||'Could not package connector.');

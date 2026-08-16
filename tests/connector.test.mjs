@@ -10,8 +10,8 @@ test('las acciones usan operationId únicos y visibles',()=>{
   for(const operation of operations)assert.equal(operation['x-ms-visibility'],'important');
 });
 
-test('Verify es público y las escrituras exigen credencial',()=>{
-  assert.deepEqual(api.paths['/govps/{code}'].get.security,[]);
+test('las acciones usan la conexión autenticada de Power Platform',()=>{
+  assert.equal(api.paths['/connectors/govps/{code}'].get.security,undefined);
   assert.equal(api.paths['/connectors/issue'].post.security,undefined);
   assert.equal(api.paths['/connectors/govps/{code}/revoke'].post.security,undefined);
 });
