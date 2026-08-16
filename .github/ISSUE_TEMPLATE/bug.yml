@@ -1,0 +1,13 @@
+name: Error reproducible
+description: Comunica un error anonimizado del custom connector.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes: { label: Versión }
+    validations: { required: true }
+  - type: textarea
+    id: reproduction
+    attributes: { label: Reproducción sin datos del entorno }
+    validations: { required: true }

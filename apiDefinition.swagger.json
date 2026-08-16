@@ -1,0 +1,131 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "GOVP Exchange",
+    "description": "Issue, verify and revoke GOVP from Power Automate and Power Apps.",
+    "version": "0.1.0"
+  },
+  "host": "partners.gemacode.org",
+  "basePath": "/api/exchange",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "api_key": { "type": "apiKey", "name": "Authorization", "in": "header" }
+  },
+  "security": [{ "api_key": [] }],
+  "paths": {
+    "/connectors/me": {
+      "get": {
+        "operationId": "GetConnectorIdentity",
+        "summary": "Test connection",
+        "description": "Returns the connector identity associated with the credential.",
+        "x-ms-summary": "Test GOVP connection",
+        "x-ms-visibility": "important",
+        "responses": {
+          "200": { "description": "Connector identity", "schema": { "$ref": "#/definitions/ConnectorIdentityResponse" } },
+          "401": { "$ref": "#/responses/Unauthorized" }
+        }
+      }
+    },
+    "/connectors/issue": {
+      "post": {
+        "operationId": "IssueGovp",
+        "summary": "Issue a GOVP",
+        "description": "Issues a GOVP idempotently from a Power Automate business event.",
+        "x-ms-summary": "Issue GOVP",
+        "x-ms-visibility": "important",
+        "parameters": [
+          { "name": "Idempotency-Key", "in": "header", "required": true, "type": "string", "minLength": 8, "maxLength": 160, "x-ms-summary": "Stable idempotency key", "x-ms-visibility": "important" },
+          { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/IssuanceCommand" } }
+        ],
+        "responses": {
+          "200": { "description": "Existing idempotent GOVP", "schema": { "$ref": "#/definitions/IssuanceResponse" } },
+          "201": { "description": "New GOVP", "schema": { "$ref": "#/definitions/IssuanceResponse" } },
+          "401": { "$ref": "#/responses/Unauthorized" },
+          "422": { "$ref": "#/responses/InvalidRequest" }
+        }
+      }
+    },
+    "/govps/{code}": {
+      "get": {
+        "operationId": "VerifyGovp",
+        "summary": "Verify a GOVP",
+        "description": "Returns public GOVP status, reason and integrity.",
+        "x-ms-summary": "Verify GOVP",
+        "x-ms-visibility": "important",
+        "security": [],
+        "parameters": [{ "name": "code", "in": "path", "required": true, "type": "string", "x-ms-summary": "GOVP code" }],
+        "responses": {
+          "200": { "description": "Verification result", "schema": { "$ref": "#/definitions/VerificationResponse" } },
+          "404": { "$ref": "#/responses/NotFound" }
+        }
+      }
+    },
+    "/connectors/govps/{code}/revoke": {
+      "post": {
+        "operationId": "RevokeGovp",
+        "summary": "Revoke a GOVP",
+        "description": "Revokes an active GOVP owned by this connector.",
+        "x-ms-summary": "Revoke GOVP",
+        "x-ms-visibility": "important",
+        "parameters": [
+          { "name": "code", "in": "path", "required": true, "type": "string", "x-ms-summary": "GOVP code" },
+          { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/RevocationCommand" } }
+        ],
+        "responses": {
+          "200": { "description": "Revoked", "schema": { "$ref": "#/definitions/RevocationResponse" } },
+          "401": { "$ref": "#/responses/Unauthorized" },
+          "404": { "$ref": "#/responses/NotFound" },
+          "409": { "$ref": "#/responses/Conflict" }
+        }
+      }
+    }
+  },
+  "responses": {
+    "Unauthorized": { "description": "Invalid connector credential", "schema": { "$ref": "#/definitions/ErrorResponse" } },
+    "InvalidRequest": { "description": "Invalid issuance command", "schema": { "$ref": "#/definitions/ErrorResponse" } },
+    "NotFound": { "description": "GOVP not found", "schema": { "$ref": "#/definitions/ErrorResponse" } },
+    "Conflict": { "description": "Lifecycle conflict", "schema": { "$ref": "#/definitions/ErrorResponse" } }
+  },
+  "definitions": {
+    "Party": {
+      "type": "object", "required": ["name"],
+      "properties": { "name": { "type": "string" }, "email": { "type": "string", "format": "email" } }
+    },
+    "Subject": {
+      "type": "object", "required": ["type", "id", "name"],
+      "properties": {
+        "type": { "type": "string", "enum": ["product", "lot", "order", "shipment", "service"] },
+        "id": { "type": "string" }, "name": { "type": "string" }, "description": { "type": "string" }
+      }
+    },
+    "Evidence": {
+      "type": "object", "required": ["label"],
+      "properties": { "label": { "type": "string" }, "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "url": { "type": "string", "format": "uri" } }
+    },
+    "Source": {
+      "type": "object", "required": ["platform"],
+      "properties": { "platform": { "type": "string", "enum": ["power_automate"] }, "externalId": { "type": "string" } }
+    },
+    "IssuanceCommand": {
+      "type": "object", "required": ["issuer", "subject", "requirement", "evidence", "validUntil", "source"],
+      "properties": {
+        "issuer": { "$ref": "#/definitions/Party" }, "recipient": { "$ref": "#/definitions/Party" },
+        "subject": { "$ref": "#/definitions/Subject" }, "requirement": { "type": "string" },
+        "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/Evidence" } },
+        "validUntil": { "type": "string", "format": "date-time" }, "source": { "$ref": "#/definitions/Source" }
+      }
+    },
+    "GovpReference": {
+      "type": "object", "required": ["id", "code", "status", "verifyUrl"],
+      "properties": { "id": { "type": "string" }, "code": { "type": "string" }, "status": { "type": "string" }, "issuedAt": { "type": "string" }, "validUntil": { "type": "string" }, "verifyUrl": { "type": "string" }, "apiUrl": { "type": "string" }, "downloadUrl": { "type": "string" } }
+    },
+    "IssuanceResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "replayed": { "type": "boolean" }, "govp": { "$ref": "#/definitions/GovpReference" } } },
+    "VerificationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "verification": { "type": "object", "properties": { "status": { "type": "string" }, "reasonCode": { "type": "string" }, "integrityValid": { "type": "boolean" } } }, "govp": { "type": "object" }, "lifecycle": { "type": "object" } } },
+    "RevocationCommand": { "type": "object", "required": ["reason"], "properties": { "reason": { "type": "string" } } },
+    "RevocationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "status": { "type": "string", "enum": ["revoked"] }, "revokedAt": { "type": "string", "format": "date-time" } } },
+    "ConnectorIdentityResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "connector": { "type": "object" } } },
+    "ErrorResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "error": { "type": "string" } } }
+  }
+}

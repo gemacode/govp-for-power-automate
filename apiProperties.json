@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "api_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "GOVP Connector Authorization",
+          "description": "Enter Bearer followed by the GOVP Exchange connector token.",
+          "tooltip": "Example: Bearer gx_your_token",
+          "constraints": { "required": "true", "tabIndex": 2 }
+        }
+      }
+    },
+    "iconBrandColor": "#0B6B4F",
+    "capabilities": [],
+    "publisher": "Gemacode",
+    "stackOwner": "GOVP"
+  }
+}
