@@ -4,6 +4,8 @@
 
 - Trigger webhook no-code para eventos GOVP firmados.
 - Alta y baja automáticas mediante callback URL y cabecera `Location`.
+- Ciclo nativo del trigger validado en Power Automate: alta, entrega
+  `govp.issued`, ejecución correcta y baja automática.
 
 ## 0.1.1 — 2026-08-16
 

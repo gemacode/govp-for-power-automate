@@ -3,10 +3,11 @@
 Custom connector open source para emitir, comprobar y revocar GOVP desde Power
 Automate y Power Apps sin escribir código.
 
-> Estado `0.2.0`: las acciones `0.1.1` siguen validadas de extremo a extremo y
-> se añade un trigger webhook candidato pendiente de importación nativa.
-> entorno Power Platform real. La validación cubre conexión, identidad, emisión,
-> repetición idempotente, comprobación, revocación y comprobación posterior.
+> Estado `0.2.0`: listo. Las acciones y el trigger webhook están validados de
+> extremo a extremo en un entorno Power Platform real. La validación cubre
+> conexión, alta de suscripción, entrega `govp.issued`, ejecución correcta,
+> baja automática, identidad, emisión, repetición idempotente, comprobación y
+> revocación.
 
 ## Contenido
 
@@ -52,8 +53,10 @@ Power Platform no verifica por sí solo la firma declarada en OpenAPI: para una
 decisión de alto riesgo, conserva `event.id` con unicidad duradera y valida la
 firma mediante un componente confiable antes de continuar el flujo.
 
-El trigger se mantiene como candidato hasta importarlo y ejecutarlo en el
-entorno de prueba Power Platform; las acciones ya validadas no pierden su estado.
+El trigger fue validado en `GOVP CRM Test`: Power Automate creó la suscripción,
+aceptó la entrega con `202`, ejecutó el flujo y desactivó el endpoint al eliminar
+el flujo. El flujo, el token y los datos sintéticos de Exchange se retiraron al
+terminar la prueba.
 
 ## Desarrollo
 
