@@ -3,7 +3,7 @@
   "info": {
     "title": "GOVP Exchange",
     "description": "Issue, verify and revoke GOVP from Power Automate and Power Apps.",
-    "version": "0.1.1"
+    "version": "0.2.0"
   },
   "host": "partners.gemacode.org",
   "basePath": "/api/exchange",
@@ -79,6 +79,48 @@
           "409": { "$ref": "#/responses/Conflict" }
         }
       }
+    },
+    "/connectors/webhooks": {
+      "x-ms-notification-content": {
+        "description": "Signed GOVP Exchange event.",
+        "schema": { "$ref": "#/definitions/WebhookEnvelope" }
+      },
+      "post": {
+        "operationId": "WhenGovpEventOccurs",
+        "summary": "When a GOVP event occurs",
+        "description": "Registers the flow callback and starts the flow for selected signed GOVP events.",
+        "x-ms-summary": "When a GOVP event occurs",
+        "x-ms-visibility": "important",
+        "x-ms-trigger": "single",
+        "x-ms-trigger-hint": "Issue, verify or revoke a GOVP owned by this connector.",
+        "parameters": [
+          { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/WebhookSubscriptionCommand" } }
+        ],
+        "responses": {
+          "201": {
+            "description": "Webhook subscription created",
+            "headers": { "Location": { "type": "string", "description": "Absolute URL used to delete this subscription." } },
+            "schema": { "$ref": "#/definitions/WebhookSubscriptionResponse" }
+          },
+          "401": { "$ref": "#/responses/Unauthorized" },
+          "422": { "$ref": "#/responses/InvalidRequest" }
+        }
+      }
+    },
+    "/connectors/webhooks/{id}": {
+      "delete": {
+        "operationId": "DeleteGovpEventSubscription",
+        "summary": "Delete GOVP event subscription",
+        "description": "Disables the webhook when the flow or trigger is removed.",
+        "x-ms-summary": "Delete GOVP event subscription",
+        "x-ms-visibility": "internal",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": {
+          "200": { "description": "Webhook disabled" },
+          "401": { "$ref": "#/responses/Unauthorized" },
+          "404": { "$ref": "#/responses/NotFound" }
+        }
+      }
     }
   },
   "responses": {
@@ -122,6 +164,22 @@
     },
     "IssuanceResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "replayed": { "type": "boolean" }, "govp": { "$ref": "#/definitions/GovpReference" } } },
     "VerificationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "verification": { "type": "object", "properties": { "status": { "type": "string" }, "reasonCode": { "type": "string" }, "integrityValid": { "type": "boolean" } } }, "govp": { "type": "object" }, "lifecycle": { "type": "object" } } },
+    "WebhookSubscriptionCommand": {
+      "type": "object", "required": ["url", "events"],
+      "properties": {
+        "url": { "type": "string", "format": "uri", "x-ms-notification-url": true },
+        "events": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["govp.issued", "govp.verified", "govp.revoked", "govp.superseded"] } }
+      }
+    },
+    "WebhookSubscriptionResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "webhook": { "type": "object", "properties": { "id": { "type": "string" }, "url": { "type": "string" }, "events": { "type": "array", "items": { "type": "string" } }, "status": { "type": "string" } } } } },
+    "WebhookEnvelope": {
+      "type": "object", "required": ["event", "payloadSha256", "signature"],
+      "properties": {
+        "event": { "type": "object", "required": ["schema", "id", "type", "occurredAt", "connectorId", "data"], "properties": { "schema": { "type": "string" }, "id": { "type": "string" }, "type": { "type": "string" }, "occurredAt": { "type": "string", "format": "date-time" }, "connectorId": { "type": "string" }, "data": { "type": "object" } } },
+        "payloadSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "signature": { "type": "object", "required": ["algorithm", "keyId", "value"], "properties": { "algorithm": { "type": "string" }, "keyId": { "type": "string" }, "value": { "type": "string" }, "publicJwk": { "type": "object" } } }
+      }
+    },
     "RevocationCommand": { "type": "object", "required": ["reason"], "properties": { "reason": { "type": "string" } } },
     "RevocationResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "status": { "type": "string", "enum": ["revoked"] }, "revokedAt": { "type": "string", "description": "UTC timestamp in ISO 8601 format." } } },
     "ConnectorIdentityResponse": { "type": "object", "properties": { "ok": { "type": "boolean" }, "connector": { "type": "object" } } },

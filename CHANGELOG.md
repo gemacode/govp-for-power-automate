@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0 — 2026-08-17
+
+- Trigger webhook no-code para eventos GOVP firmados.
+- Alta y baja automáticas mediante callback URL y cabecera `Location`.
+
 ## 0.1.1 — 2026-08-16
 
 - ciclo nativo completo validado en Power Automate: conexión, identidad,

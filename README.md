@@ -3,7 +3,8 @@
 Custom connector open source para emitir, comprobar y revocar GOVP desde Power
 Automate y Power Apps sin escribir código.
 
-> Estado `0.1.1`: conector instalado y validado de extremo a extremo en un
+> Estado `0.2.0`: las acciones `0.1.1` siguen validadas de extremo a extremo y
+> se añade un trigger webhook candidato pendiente de importación nativa.
 > entorno Power Platform real. La validación cubre conexión, identidad, emisión,
 > repetición idempotente, comprobación, revocación y comprobación posterior.
 
@@ -13,6 +14,7 @@ Automate y Power Apps sin escribir código.
 - `apiProperties.json`: credencial segura y metadatos del conector;
 - acciones **Issue GOVP**, **Verify GOVP** y **Revoke GOVP**;
 - acción de prueba de conexión mediante `/connectors/me`;
+- trigger **When a GOVP event occurs**, con alta y baja automáticas;
 - idempotencia obligatoria en emisión.
 
 La comprobación HTTP `/govps/{code}` de Exchange continúa siendo pública. Dentro
@@ -41,12 +43,17 @@ Bearer gx_el_token_del_conector
 El token se trata como `securestring`. No lo incluyas en parámetros, soluciones
 exportadas, capturas ni historial del flujo.
 
-## Límite explícito
+## Trigger firmado
 
-Exchange todavía no publica un contrato de suscripción con webhooks firmados.
-Por eso esta versión ofrece acciones, pero no finge triggers de solicitud,
-emisión, entrega, rechazo o revocación. Esos triggers se añadirán cuando exista
-replay protection, rotación y entrega verificable del webhook.
+Power Automate entrega a Exchange una callback secreta al activar el flujo y
+la elimina automáticamente usando la cabecera `Location`. El payload incluye
+evento, huella y firma ECDSA. La URL de callback limita el origen práctico, pero
+Power Platform no verifica por sí solo la firma declarada en OpenAPI: para una
+decisión de alto riesgo, conserva `event.id` con unicidad duradera y valida la
+firma mediante un componente confiable antes de continuar el flujo.
+
+El trigger se mantiene como candidato hasta importarlo y ejecutarlo en el
+entorno de prueba Power Platform; las acciones ya validadas no pierden su estado.
 
 ## Desarrollo
 
@@ -54,7 +61,7 @@ replay protection, rotación y entrega verificable del webhook.
 npm run check
 ```
 
-La salida reproducible queda en `dist/govp-for-power-automate-0.1.1.zip`.
+La salida reproducible queda en `dist/govp-for-power-automate-0.2.0.zip`.
 
 Apache-2.0. Microsoft, Power Automate y Power Apps son marcas de Microsoft; este
 proyecto no está afiliado ni certificado por Microsoft.
